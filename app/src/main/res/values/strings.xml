@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Proyect1</string>
+    <string name="nuevo_contador">Nuevo contador</string>
+    <string name="guardado_con_exito">Contador guardado con éxito</string>
+    <string name="error_guardar_db">Error de la BD</string>
+    <string name="update_es">Actualizar</string>
+    <string name="database_error">Database Error</string>
+    <string name="changing_to_fixed_list">Cambiando a lista fija</string>
+</resources>
