@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void update(){
+    public void update(){
         CounterAdapter adapter = new CounterAdapter(this, 1, dbHelper.obtenerContadores());
         listView.setAdapter(adapter);
     }

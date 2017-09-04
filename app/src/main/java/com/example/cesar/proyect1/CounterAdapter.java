@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cesar.proyect1.Database.Contador;
 import com.example.cesar.proyect1.Database.DBHelper;
@@ -28,13 +29,13 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
         super(context, resource, objects);
         this.context = context;
         counters = objects;
-
+        db = new DBHelper(getContext());
 
 
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         // 1. Create inflater
 
@@ -50,7 +51,7 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // 2. Get rowView from inflater
-        View rowView = inflater.inflate(R.layout.fila_contador, parent, false);
+        final View rowView = inflater.inflate(R.layout.fila_contador, parent, false);
 
 
 
@@ -65,18 +66,63 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
             ImageButton imgDec = (ImageButton) rowView.findViewById(R.id.btn_decrementar);
             ImageButton imgDel = (ImageButton) rowView.findViewById(R.id.btn_eliminar);
 
+            imgInc.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    inc(rowView);
+                }
+            });
+
+            imgDec.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dec(rowView);
+                }
+            });
+
+            imgDel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    delete(rowView);
+                }
+            });
+
             nameText.setText(c.getNombre());
             numberText.setText(Integer.toString(c.getCuenta()));
 
         }
 
-
-
-
-
         // 5. retrn rowView
         return rowView;
     }
 
+    private void inc(View row){
+        TextView txt = (TextView) row.findViewById(R.id.texto_cantidad);
+        int cantidad = Integer.parseInt(txt.getText().toString());
+        cantidad++;
+        txt.setText(cantidad);
+
+        // CONTINUAR
+
+    }
+
+    private void dec(View row){
+
+    }
+
+    private void delete(View row){
+
+        TextView txt = (TextView) row.findViewById(R.id.texto_nombre);
+        String nombre = txt.getText().toString();
+        db.eliminarContador(nombre);
+
+    }
+
+    public void update(){
+//        for (Contador c : counters) {
+//            this.remove(c);
+//        }
+//        this.addAll(db.obtenerContadores());
+    }
 
 }

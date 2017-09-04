@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.cesar.proyect1.CounterAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String NAME_COLUMN = "name";
     private static final String COUNT_COLUMN = "count";
     private static final String ID_COLUMN = "id";
+    private CounterAdapter adapter;
 
     private static final String SQL_CREATE_ENTRIES = "Create Table "
             + DB_TABLE_COUNTER
@@ -36,9 +39,9 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, name, factory, version);
     }
 
-    public DBHelper(Context context){
+    public DBHelper(Context context, CounterAdapter adapter){
         super(context, DB_NAME, null, DB_VERSION);
-
+        this.adapter = adapter;
 
     }
 
@@ -112,7 +115,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public void eliminarContador(Contador c){
+    public void eliminarContador(String nombre){
+        SQLiteDatabase db = getWritableDatabase();
 
+        try{
+            db.delete(DB_TABLE_COUNTER, NAME_COLUMN + "='" + nombre + "'", null);
+        }catch (SQLiteException e){
+
+        }
     }
 }
