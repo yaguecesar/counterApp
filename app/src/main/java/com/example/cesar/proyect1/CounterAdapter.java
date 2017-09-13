@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -43,8 +44,6 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
         //List<Contador> list = db.obtenerContadores();
 
 
-
-
         Contador c = null;
 
         LayoutInflater inflater = (LayoutInflater) getContext()
@@ -66,26 +65,20 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
             ImageButton imgDec = (ImageButton) rowView.findViewById(R.id.btn_decrementar);
             ImageButton imgDel = (ImageButton) rowView.findViewById(R.id.btn_eliminar);
 
-            imgInc.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    inc(rowView);
-                }
-            });
+//            imgInc.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    inc(rowView);
+//                }
+//            });
+//
+//            imgDec.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    dec(rowView);
+//                }
+//            });
 
-            imgDec.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dec(rowView);
-                }
-            });
-
-            imgDel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    delete(rowView);
-                }
-            });
 
             nameText.setText(c.getNombre());
             numberText.setText(Integer.toString(c.getCuenta()));
@@ -96,33 +89,44 @@ public class CounterAdapter extends ArrayAdapter<Contador> {
         return rowView;
     }
 
-    private void inc(View row){
-        TextView txt = (TextView) row.findViewById(R.id.texto_cantidad);
-        int cantidad = Integer.parseInt(txt.getText().toString());
-        cantidad++;
-        txt.setText(cantidad);
 
-        // CONTINUAR
 
-    }
-
-    private void dec(View row){
-
-    }
-
-    private void delete(View row){
-
-        TextView txt = (TextView) row.findViewById(R.id.texto_nombre);
-        String nombre = txt.getText().toString();
-        db.eliminarContador(nombre);
-
-    }
-
-    public void update(){
-//        for (Contador c : counters) {
-//            this.remove(c);
+//    private void inc(View row){
+//        TextView txt = (TextView) row.findViewById(R.id.texto_cantidad);
+//        int cantidad = Integer.parseInt(txt.getText().toString());
+//        cantidad++;
+//        txt.setText(cantidad);
+//
+//        // CONTINUAR
+//
+//    }
+//
+//    private void dec(View row){
+//
+//    }
+//
+//    private void delete(View row){
+//
+//        TextView txt = (TextView) row.findViewById(R.id.texto_nombre);
+//        String nombre = txt.getText().toString();
+//        db.eliminarContador(nombre);
+//
+//        Contador c = new Contador("a", 0);
+//
+//        for (int i = 0; i < counters.size(); i++){
+//            c = counters.get(i);
+//            if (c.getNombre().compareTo(nombre) == 0){
+//
+//
+//            }
 //        }
-//        this.addAll(db.obtenerContadores());
-    }
+//    }
+//
+//    public void update(){
+////        for (Contador c : counters) {
+////            this.remove(c);
+////        }
+////        this.addAll(db.obtenerContadores());
+//    }
 
 }

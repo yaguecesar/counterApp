@@ -39,9 +39,9 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, name, factory, version);
     }
 
-    public DBHelper(Context context, CounterAdapter adapter){
+    public DBHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
-        this.adapter = adapter;
+
 
     }
 

@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private EditText newCounter;
     private DBHelper dbHelper;
     private ListView listView;
+    private CounterAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +39,38 @@ public class MainActivity extends Activity implements View.OnClickListener{
         newCounter = (EditText) findViewById(R.id.edit_nuevo_contador);
         listView = (ListView) findViewById(R.id.list_view_contadores);
 
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "On Click", Toast.LENGTH_SHORT).show();
+
+                switch (view.getId()){
+
+                    case R.id.btn_eliminar:
+                        removeCounter(position);
+
+                        Toast.makeText(MainActivity.this, "Eliminar " + position + " pulsado", Toast.LENGTH_LONG).show();
+                        break;
+                    case R.id.btn_incrementar:
+
+                        break;
+                    case R.id.btn_decrementar:
+
+                        break;
+                    default:
+
+                        Toast.makeText(MainActivity.this, "default", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        });
+
         btnOK.setOnClickListener(this);
 
         List<Contador> lista = null;
+
+
 
         try{
             lista = dbHelper.obtenerContadores(); //new ArrayList<Contador>();
@@ -57,7 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
 
-        CounterAdapter adapter = new CounterAdapter(this, 1, lista);
+        adapter = new CounterAdapter(this, 1, lista);
 
         listView.setAdapter(adapter);
 
@@ -70,7 +101,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
             Toast.makeText(this, "Click", Toast.LENGTH_LONG).show();
             if (!newCounter.getText().toString().isEmpty()) {
                 newCounter();
-                update();
             }
 
         }
@@ -82,15 +112,25 @@ public class MainActivity extends Activity implements View.OnClickListener{
         try{
             dbHelper.guardarContador(c);
             this.newCounter.setText("");
+
+            adapter.add(c);
+
             Toast.makeText(this, R.string.guardado_con_exito, Toast.LENGTH_SHORT).show();
         }catch (SQLiteException e){
             Toast.makeText(this, getString(R.string.error_guardar_db), Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void update(){
-        CounterAdapter adapter = new CounterAdapter(this, 1, dbHelper.obtenerContadores());
-        listView.setAdapter(adapter);
+
+
+    public void removeCounter(int position){
+
+        String name = adapter.getItem(position).getNombre();
+
+        dbHelper.eliminarContador(name);
+
+        listView.removeViewAt(position);
+
     }
 
     @Override
@@ -105,10 +145,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.action_update){
-            update();
-        }
+//        if (item.getItemId() == R.id.action_update){
+//            update();
+//        }
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
