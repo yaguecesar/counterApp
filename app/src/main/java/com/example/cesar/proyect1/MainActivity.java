@@ -1,17 +1,21 @@
 package com.example.cesar.proyect1;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cesar.proyect1.Database.Contador;
@@ -27,6 +31,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private DBHelper dbHelper;
     private ListView listView;
     private CounterAdapter adapter;
+    List<Contador> lista = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,36 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         newCounter = (EditText) findViewById(R.id.edit_nuevo_contador);
         listView = (ListView) findViewById(R.id.list_view_contadores);
 
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "On Click", Toast.LENGTH_SHORT).show();
-
-                switch (view.getId()){
-
-                    case R.id.btn_eliminar:
-                        removeCounter(position);
-
-                        Toast.makeText(MainActivity.this, "Eliminar " + position + " pulsado", Toast.LENGTH_LONG).show();
-                        break;
-                    case R.id.btn_incrementar:
-
-                        break;
-                    case R.id.btn_decrementar:
-
-                        break;
-                    default:
-
-                        Toast.makeText(MainActivity.this, "default", Toast.LENGTH_LONG).show();
-
-                }
-            }
-        });
-
         btnOK.setOnClickListener(this);
-
-        List<Contador> lista = null;
 
 
 
@@ -88,7 +64,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
 
-        adapter = new CounterAdapter(this, 1, lista);
+        CounterAdapter adapter = new CounterAdapter(this, 1, lista);
+        this.adapter = adapter;
 
         listView.setAdapter(adapter);
 
@@ -111,26 +88,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         try{
             dbHelper.guardarContador(c);
-            this.newCounter.setText("");
-
-            adapter.add(c);
-
+            lista.add(c);
+            adapter.notifyDataSetChanged();
+//            this.newCounter.setText("");
             Toast.makeText(this, R.string.guardado_con_exito, Toast.LENGTH_SHORT).show();
         }catch (SQLiteException e){
             Toast.makeText(this, getString(R.string.error_guardar_db), Toast.LENGTH_SHORT).show();
         }
-    }
-
-
-
-    public void removeCounter(int position){
-
-        String name = adapter.getItem(position).getNombre();
-
-        dbHelper.eliminarContador(name);
-
-        listView.removeViewAt(position);
-
     }
 
     @Override
@@ -145,12 +109,118 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        if (item.getItemId() == R.id.action_update){
-//            update();
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 
+    private class CounterAdapter extends ArrayAdapter<Contador> {
 
+        private List<Contador> counters;
+        private Context context;
+        private DBHelper db;
+
+        public CounterAdapter(Context context, int resource, List<Contador> objects) {
+            super(context, resource, objects);
+            this.context = context;
+            counters = objects;
+            db = new DBHelper(getContext());
+        }
+
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+
+            // 1. Create inflater
+
+            DBHelper db = new DBHelper(getContext());
+            //List<Contador> list = db.obtenerContadores();
+
+            final Contador c;
+
+            LayoutInflater inflater = (LayoutInflater) getContext()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            // 2. Get rowView from inflater
+            final View rowView = inflater.inflate(R.layout.fila_contador, parent, false);
+
+
+
+
+            if (!counters.isEmpty() && position <= counters.size()){
+//             c = db.obtenerContadores().get(position);
+                c = counters.get(position);
+                TextView nameText = (TextView) rowView.findViewById(R.id.texto_nombre);
+                TextView numberText = (TextView) rowView.findViewById(R.id.texto_cantidad);
+
+                ImageButton imgInc = (ImageButton) rowView.findViewById(R.id.btn_incrementar);
+                ImageButton imgDec = (ImageButton) rowView.findViewById(R.id.btn_decrementar);
+                ImageButton imgDel = (ImageButton) rowView.findViewById(R.id.btn_eliminar);
+
+
+                imgInc.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        inc(rowView, c);
+                    }
+                });
+
+                imgDec.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dec(rowView, c);
+                    }
+                });
+
+                imgDel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        delete(rowView);
+                    }
+                });
+
+                nameText.setText(c.getNombre());
+                numberText.setText(Integer.toString(c.getCuenta()));
+
+            }
+
+            // 5. retrn rowView
+            return rowView;
+        }
+
+        private void inc(View row, Contador c){
+            TextView txtNombre = (TextView) row.findViewById(R.id.texto_cantidad);
+
+            c.incrementar();
+            txtNombre.setText(Integer.toString(c.getCuenta()));
+
+
+            db.actualizarContador(c);
+
+        }
+
+        private void dec(View row, Contador c){
+            TextView txtCantidad = (TextView) row.findViewById(R.id.texto_cantidad);
+
+            c.decrementar();
+
+            txtCantidad.setText(Integer.toString(c.getCuenta()));
+
+            db.actualizarContador(c);
+
+        }
+
+        private void delete(View row){
+
+            TextView txt = (TextView) row.findViewById(R.id.texto_nombre);
+            String nombre = txt.getText().toString();
+            db.eliminarContador(nombre);
+
+            int position = listView.getPositionForView(row);
+            counters.remove(position);
+            notifyDataSetChanged();
+
+
+
+        }
+
+    }
 }
